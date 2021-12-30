@@ -6,7 +6,7 @@ const model = require('./sdk/model.js');
 
 // Bot Setting
 const TelegramBot = require('node-telegram-bot-api');
-const token = '5064364234:AAGQxzNR3XjLja4zo__iCE5a-3mzKld4m3Q'
+const token = '5002726685:AAHEjvJwJdfjPImumA1GfCPHoeu3mCMbbas'
 const bot = new TelegramBot(token, {polling: true});
 
 
@@ -25,29 +25,35 @@ state = 0;
 bot.onText(/\/predict/, (msg) => { 
     bot.sendMessage(
         msg.chat.id,
-        `masukan nilai i|v contoh 9|9`
+        `masukan nilai y1|y2|y3 contoh 9|9|9`
     );   
     state = 1;
 });
 
 bot.on('message', (msg) => {
     if(state == 1){
-        s = msg.text.split("|");
-        i = s[0]
-        v = s[1]
+        s = msg.text.split("| |");
+        y1 = s[0]
+        y2 = s[1]
+        y3 = s[2]
         model.predict(
             [
                 parseFloat(s[0]), // string to Float
-                parseFloat(s[1])
+                parseFloat(s[1]),
+                parseFloat(s[2])
             ]
         ).then((jres)=>{
             bot.sendMessage(
                 msg.chat.id,
-                `nilai v yang diprediksi adalah ${jres[0]} volt` 
+                `nilai y1 yang diprediksi adalah ${jres[0]} y1` 
            );
             bot.sendMessage(
                 msg.chat.id,
-                `nilai p yang diprediksi adalah ${jres[1]} watt`
+                `nilai y2 yang diprediksi adalah ${jres[1]} y2`
+           );
+            bot.sendMessage(
+                msg.chat.id,
+                `nilai y3 yang diprediksi adalah ${jres[2]} y3`
            );
        })
     }else{
@@ -59,8 +65,9 @@ bot.on('message', (msg) => {
 r.get('/prediction/:i/:r', function(req, res, next) {    
     model.predict(
         [
-            parseFloat(req.params.i), // string to float
-            parseFloat(req.params.r)
+            parseFloat(req.params.x1), // string to float
+            parseFloat(req.params.x2),
+            parseFloat(req.params.x3)
         ]
     ).then((jres)=>{
         res.json(jres);
